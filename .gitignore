@@ -1,0 +1,5 @@
+**.npy
+**.txt
+old_K/
+__pycache__/
+.idea/
