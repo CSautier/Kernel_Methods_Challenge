@@ -33,7 +33,6 @@ def main():
 
     kernels = [np.load(p)[m*2000:(m+1)*2000,m*2000:(m+1)*2000] for p in args.kernels]
     nk = len(kernels)
-    #K = kernels[0]
     K_list = []
     for K, s in zip(kernels, sigma):
         D = np.sqrt(np.diag(K))
@@ -41,9 +40,6 @@ def main():
         K = np.divide(K, D[None, :])
         if s>0:
             K = np.exp((K-1)/(s**2))
-            #D = np.sqrt(np.diag(K))
-            #K = np.divide(K, D[:,None])
-            #K = np.divide(K, D[None, :])
         K_list.append(K)
 
     if not test:
@@ -73,11 +69,9 @@ def main():
         D[eta_argmax] = np.sum(grad_max - grad)
         print(-D)
         eta -= lr*D
-        # eta = euclidean_proj_simplex(eta)
 
         print(f"Weights: {eta}.")
         w = gamma
-        #w = np.diag(Y_train).dot(mu)/(2*l)
         if not test:
             print("Predicting on validation set.")
             Kv = np.sum(eta[:,None,None]*Kv_arr, axis=0)
@@ -94,6 +88,7 @@ def main():
     if test:
         np.save(f'w-{m}.npy', w)
     print('\n')
+
 
 if __name__ == "__main__":
     main()

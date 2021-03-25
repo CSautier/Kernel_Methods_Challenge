@@ -13,11 +13,7 @@ args = parser.parse_args()
 
 def main():
 
-    np.random.seed(4)
-
-    # m = 2
-    # for m in range(3):
-    for m in range(2,3):
+    for m in range(3):
         Y_paths = [f'data/Ytr{i}.csv' for i in range(m,m+1)]
         Y = load_Y(Y_paths)
         Y[Y==0] = -1
@@ -27,18 +23,12 @@ def main():
 
         kernels = [np.load(p)[m*2000:(m+1)*2000,m*2000:(m+1)*2000] for p in args.kernels]
         nk = len(kernels)
-        #K = kernels[0]
         n = len(Y)
-        #ind = np.arange(n)
-        #np.random.shuffle(ind)
-        #p = int(n*args.split)
 
         f = open(f'logs-{m}.txt', 'w')
 
-        # for s in [0.46, 0.48, 0.5, 0.52, 0.54, 0.56, 0.58, 0.6, 0.62, 0.64, 0.66, 0.68, 0.7, 0.72, 0.74, 0.76, 0.78,
-        #           0.80]:
-        # for s in [0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.80]:
-        for s in [0.68, 0.72]:
+        for s in [0.46, 0.48, 0.5, 0.52, 0.54, 0.56, 0.58, 0.6, 0.62, 0.64, 0.66, 0.68, 0.7, 0.72, 0.74, 0.76, 0.78,
+                  0.80]:
 
             K_list = []
             for K in kernels:
@@ -73,20 +63,14 @@ def main():
                         grad_max = grad[eta_argmax]
                         D = grad - grad_max
                         D[eta_argmax] = np.sum(grad_max - grad)
-                        #print(-D)
                         eta -= lr*D
-                        # eta = euclidean_proj_simplex(eta)
-
-                        #print(f"Weights: {eta}.")
                         w = gamma
-                        #w = np.diag(Y_train).dot(mu)/(2*l)
                         Kv = np.sum(eta[:,None,None]*Kv_arr, axis=0)
                         Y_pred = Kv.dot(w)
                         acc = np.sum(np.sign(Y_val)==np.sign(Y_pred))/len(Y_val)
                         print(f"{a}-{b}: {round(acc, 4)}")
 
                     acc_mean += acc
-                    # print(eta)
 
                 acc_mean /= 10
                 acc_mean = round(acc_mean, 4)
@@ -95,6 +79,7 @@ def main():
                 f.write(' '.join(map(str, [s, l, acc_mean])) + '\n')
 
         f.close()
+
 
 if __name__ == "__main__":
     main()
