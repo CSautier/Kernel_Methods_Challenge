@@ -1,7 +1,6 @@
-import sys
-import numpy as np
 from numba import jit, prange
 from utils import *
+
 
 ########## Recursive (slower) ##########
 
@@ -25,6 +24,7 @@ from utils import *
 #    else:
 #        B[i,j,k] = l*B[i-1, j, k] + l*B[i, j-1, k] - l**2*B[i-1, j-1, k]
 #    return B[i,j,k]
+
 
 @jit(nopython=True)
 def B_dyn(B, x1, x2, k, l):
@@ -54,7 +54,6 @@ def B_dyn(B, x1, x2, k, l):
         vals.pop()
     return B[i,j,k]
 
-########## Recursive (slower) ##########
 
 @jit(nopython=True)
 def K_dyn(B, x1, x2, k, l):
@@ -64,24 +63,6 @@ def K_dyn(B, x1, x2, k, l):
         np.array([B_dyn(B, x1[:-1], x2[:j], k-1, l) for j in range(len(x2)) if x2[j]==x1[-1]])
     )
 
-# @jit(nopython=True)
-# def K_dyn(B, x1, x2, k, l):
-#     n1, n2 = len(x1), len(x2)
-#     vals = [(n1, n2)]
-#     K = -np.ones((n1+1, n2+1))
-#     while vals:
-#         i,j = vals[-1]
-#         if K[i,j] != -1:
-#             vals.pop()
-#             continue
-#         if K[i-1,j] == -1:
-#             vals.append((i-1,j))
-#             continue
-#         K[i,j] = K[i-1,j] + l**2*np.sum(
-#             np.array([B_dyn(B, x1[:i], x2[:p], k-1, l) for p in range(j) if x2[p]==x1[i]])
-#         )
-#         vals.pop()
-#     return K[n1,n2]
 
 @jit(nopython=True)
 def K_k(x1, x2, k, l):
@@ -91,6 +72,7 @@ def K_k(x1, x2, k, l):
         B[:_k, :, _k] = 0
         B[:, :_k, _k] = 0
     return K_dyn(B, x1, x2, k, l)
+
 
 @jit(nopython=True, parallel=True)
 def compute_kernel(X, k, lbd):
@@ -103,6 +85,7 @@ def compute_kernel(X, k, lbd):
         for j in prange(p, p+1000):
             K[i,j] = K_k(X[i], X[j], k, lbd)
     return K
+
 
 def main():
 
@@ -118,6 +101,7 @@ def main():
     K = compute_kernel(X, k, lbd)
     K = K + K.T - np.diag(K)*np.eye(len(K))
     np.save(f"K{k}-substring-l{int(10*lbd)}_te.npy", K)
+
 
 if __name__ == "__main__":
     main()

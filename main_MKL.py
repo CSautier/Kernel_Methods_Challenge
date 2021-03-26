@@ -1,7 +1,7 @@
 import argparse
 import numpy as np
 
-from utils import train_test_split, load_X, load_Y, solve_svm_dual, solve_MKL, euclidean_proj_simplex
+from utils import load_Y, solve_MKL
 
 parser = argparse.ArgumentParser(description="Gapped K-mer SVM training.")
 parser.add_argument("-k", "--kernels", type=str, nargs='+', help='Paths to kernels', required=True)
@@ -10,15 +10,15 @@ parser.add_argument("-s", "--sigma", type=float, nargs='+', help="Exponential pa
 parser.add_argument("-l", type=float, help="Regularization parameter", required=False, default=5e-5)
 parser.add_argument("--lr", type=float, help="Learning rate", required=False, default=0.1)
 parser.add_argument("--n-iter", type=int, help="Number of iterations", required=False, default=5)
+parser.add_argument("-m", type=int, help="Number of iterations", required=False, default=0)
 parser.add_argument("--test", help="Whether to use all data for training.", action='store_true')
 args = parser.parse_args()
 
+
 def main():
 
-    #np.random.seed(4)
-
     test = args.test
-    m = 0
+    m = args.m
     Y_paths = [f'data/Ytr{m}.csv']
     Y = load_Y(Y_paths)
     Y[Y==0] = -1
@@ -30,6 +30,8 @@ def main():
     n_iter = args.n_iter
 
     print(f"Running MKL for {n_iter} iterations with learning rate {lr} and penalty {l}.")
+
+    # Loading data
 
     kernels = [np.load(p)[m*2000:(m+1)*2000,m*2000:(m+1)*2000] for p in args.kernels]
     nk = len(kernels)
@@ -52,12 +54,15 @@ def main():
         Kt_arr = np.array([K[ind[:p]][:,ind[:p]] for K in K_list])
         Kv_arr = np.array([K[ind[p:]][:, ind[:p]] for K in K_list])
     else:
-        print("Using all the data for training.")
+        # Using all the data for training
         Y_train = Y
         Kt_arr = np.array([K[:n,:n] for K in K_list])
-    print(f"First kernel values: \n {Kt_arr[:,:3,:3]}")
+
+    # print(f"First kernel values: \n {Kt_arr[:,:3,:3]}")
 
     eta = np.ones(nk)/nk
+
+    # Solve the MKL problem and update the weights
 
     for k in range(n_iter):
         Kt = np.sum(eta[:,None,None]*Kt_arr, axis=0)
@@ -67,7 +72,6 @@ def main():
         grad_max = grad[eta_argmax]
         D = grad - grad_max
         D[eta_argmax] = np.sum(grad_max - grad)
-        print(-D)
         eta -= lr*D
 
         print(f"Weights: {eta}.")

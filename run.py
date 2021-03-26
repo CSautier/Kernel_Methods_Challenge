@@ -160,8 +160,8 @@ if __name__ == "__main__":
     main()
 
     """
-    Note : Our best results were obtained with the kernels given by compute_kernel2(6,9) alone for m=0 (as done here)
-    and the one given by compute_kernel2(8,13) for the two others m, with s = 0.5 and 0.62 respectively.
+    Note : Our best results were obtained with the kernels given by K1 = compute_kernel2(6,9) (as done here)
+    and K2 = K3 = compute_kernel2(8,13) for the two others m, with s = 0.5 and 0.62 respectively.
     However, we later found a bug in this second function, and chose instead to produce this script to reproduce our
-    second best result instead, as it is very close and (hopefully) glitch-free.
+    best result, instead of the submitted one, as it is very close and (hopefully) glitch-free.
     """

@@ -15,26 +15,22 @@ def torch_binom(N, k):
 
 
 def gkm(X_i, X_j, k, l):
-  pad = torch.all(X_i[:, None] != 0, dim=-1)*torch.all(X_j[None] != 0, dim=-1)
-  M = torch.sum(X_i[:, None] != X_j[None], dim=-1)
-  return torch_binom(l-M, k)*pad
+    pad = torch.all(X_i[:, None] != 0, dim=-1)*torch.all(X_j[None] != 0, dim=-1)
+    M = torch.sum(X_i[:, None] != X_j[None], dim=-1)
+    return torch_binom(l-M, k)*pad
 
 
 def main():
 
-    test = True
-    
     X_paths = [f'data/Xtr{i}.csv' for i in range(3)]
     X = load_X(X_paths)
-   
-    if test:
-      X2_paths = [f'data/Xte{i}.csv' for i in range(3)]
-      X2 = load_X(X2_paths)
-      X = np.concatenate((X,X2))
+
+    X2_paths = [f'data/Xte{i}.csv' for i in range(3)]
+    X2 = load_X(X2_paths)
+    X = np.concatenate((X,X2))
 
     X = torch.tensor(X, dtype=torch.float32, device=device)
     n, d = X.shape
-    # K = np.zeros((n,n))
     K = torch.zeros((n,n), device=device, dtype=torch.float32)
     k = 6
     l = None
@@ -65,10 +61,9 @@ def main():
             if i % 10 == 0:
                 print(i)
 
-    test_str = "_test"
-    name = f"K{k}{test_str}.npy"
+    name = f"K{k}.npy"
     if l is not None:
-      name = f"K{k}-{l}{test_str}.npy"
+      name = f"K{k}-{l}.npy"
     print(f"Saving in {name}.")
     np.save(name, K.cpu().numpy())
 
