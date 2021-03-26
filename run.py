@@ -74,9 +74,8 @@ def compute_kernel2(k=8, l=None):
 
 
 def solve_svm(Ks):
-
+    # Regularization parameter
     l = 1e-5
-    print(f"Solving SVM. \nUsing regualarization l={l}. \n")
     Y_list = []
 
     for m, _K in enumerate(Ks):
@@ -117,14 +116,14 @@ def main():
     # K2 = np.load("K2.npy")
     # K3 = np.load("K3.npy")
 
-    ###### m=0 #######
+    ###### Compute the kernel for m=0 #######
     D = np.sqrt(np.diag(K1))
     K1 = np.divide(K1, D[:, None])
     K1 = np.divide(K1, D[None, :])
     s = 0.75
     Km0 = np.exp((K1 - 1) / (s ** 2))
 
-    ###### m=1 #######
+    ###### Compute the kernel for m=1 #######
     D = np.sqrt(np.diag(K2))
     K2 = np.divide(K2, D[:, None])
     K2 = np.divide(K2, D[None, :])
@@ -133,7 +132,7 @@ def main():
     _K2 = np.exp((K2 - 1) / (s ** 2))
     Km1 = 0.5 * _K1 + 0.5 * _K2
 
-    ###### m=2 #######
+    ###### Compute the kernel for m=2 #######
     D = np.sqrt(np.diag(K3))
     K3 = np.divide(K3, D[:, None])
     K3 = np.divide(K3, D[None, :])
@@ -147,7 +146,7 @@ def main():
     print("Saving predictions...")
     res = np.vstack((np.arange(3000), Yte)).T.astype(int)
     np.savetxt(
-        f"data/Yte_.csv",
+        f"data/Yte.csv",
         res,
         header="Id,Bound",
         delimiter=",",

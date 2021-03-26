@@ -100,7 +100,7 @@ def main():
 
     K = compute_kernel(X, k, lbd)
     K = K + K.T - np.diag(K)*np.eye(len(K))
-    np.save(f"K{k}-substring-l{int(10*lbd)}_te.npy", K)
+    np.save(f"K{k}-substring-l{int(10*lbd)}.npy", K)
 
 
 if __name__ == "__main__":

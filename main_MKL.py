@@ -58,11 +58,9 @@ def main():
         Y_train = Y
         Kt_arr = np.array([K[:n,:n] for K in K_list])
 
-    # print(f"First kernel values: \n {Kt_arr[:,:3,:3]}")
-
     eta = np.ones(nk)/nk
 
-    # Solve the MKL problem and update the weights
+    # Iteratively solve the MKL problem
 
     for k in range(n_iter):
         Kt = np.sum(eta[:,None,None]*Kt_arr, axis=0)
@@ -72,6 +70,7 @@ def main():
         grad_max = grad[eta_argmax]
         D = grad - grad_max
         D[eta_argmax] = np.sum(grad_max - grad)
+        # Update the weights
         eta -= lr*D
 
         print(f"Weights: {eta}.")
