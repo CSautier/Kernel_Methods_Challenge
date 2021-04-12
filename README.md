@@ -1,4 +1,4 @@
-# Kernel_Methods_Challenge
+# Kernel Methods Challenge
 
 ## Requirements
 
